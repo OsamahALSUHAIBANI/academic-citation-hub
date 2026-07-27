@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Citation & Research Summary Hub</title>
+    <meta name="description" content="Generate APA and MLA citations and store your research summaries seamlessly.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                            950: '#172554',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-panel {
+                @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl;
+            }
+            .input-field {
+                @apply w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300;
+            }
+            .label-text {
+                @apply block text-sm font-medium text-slate-300 mb-1.5;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen font-sans selection:bg-primary-500/30 selection:text-primary-200 overflow-x-hidden">
+    
+    <!-- Background decorations -->
+    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary-600/20 blur-[120px]"></div>
+        <div class="absolute top-[60%] -right-[10%] w-[40%] h-[40%] rounded-full bg-indigo-600/20 blur-[120px]"></div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 py-12">
+        <header class="text-center mb-16 animate-slide-up">
+            <h1 class="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-indigo-400 mb-4 tracking-tight">
+                Academic Citation Hub
+            </h1>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+                Streamline your research process. Generate precise APA and MLA citations while organizing your insightful summaries in one unified workspace.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Input Section -->
+            <div class="lg:col-span-7 space-y-8 animate-slide-up" style="animation-delay: 100ms;">
+                <div class="glass-panel p-6 md:p-8">
+                    <h2 class="text-2xl font-semibold text-white mb-6 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        Source Details
+                    </h2>
+                    
+                    <form id="citation-form" class="space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label for="authorFirst" class="label-text">Author First Name</label>
+                                <input type="text" id="authorFirst" class="input-field" placeholder="e.g., John" required>
+                            </div>
+                            <div>
+                                <label for="authorLast" class="label-text">Author Last Name</label>
+                                <input type="text" id="authorLast" class="input-field" placeholder="e.g., Doe" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="title" class="label-text">Source Title</label>
+                            <input type="text" id="title" class="input-field" placeholder="e.g., The Impact of Artificial Intelligence" required>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            <div>
+                                <label for="publishDate" class="label-text">Publish Year</label>
+                                <input type="number" id="publishDate" class="input-field" placeholder="YYYY" min="1000" max="2100" required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="publisher" class="label-text">Publisher / Container</label>
+                                <input type="text" id="publisher" class="input-field" placeholder="e.g., Journal of Technology" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="url" class="label-text">URL (Optional)</label>
+                            <input type="url" id="url" class="input-field" placeholder="https://...">
+                        </div>
+
+                        <div class="pt-2">
+                            <label for="summary" class="label-text">Research Summary / Notes</label>
+                            <textarea id="summary" rows="4" class="input-field resize-y" placeholder="Record your key takeaways, quotes, and thoughts here..."></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full py-3.5 px-6 rounded-lg bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-500 hover:to-indigo-500 text-white font-semibold text-lg shadow-lg shadow-primary-500/25 transform transition-all duration-300 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-primary-500">
+                            Generate Citation & Save
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="lg:col-span-5 space-y-6 animate-slide-up" style="animation-delay: 200ms;">
+                <div class="glass-panel p-6 md:p-8 h-full flex flex-col">
+                    <h2 class="text-2xl font-semibold text-white mb-6 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Generated Output
+                    </h2>
+
+                    <div id="empty-state" class="flex-1 flex flex-col items-center justify-center text-center p-6 text-slate-500">
+                        <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <p>Fill out the source details to generate your citations and view your summary.</p>
+                    </div>
+
+                    <div id="results-area" class="hidden space-y-6 flex-1 animate-fade-in">
+                        <!-- APA Citation -->
+                        <div class="group relative">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">APA Format (7th Edition)</h3>
+                            <div class="bg-slate-900/60 border border-slate-700/50 p-4 rounded-lg text-slate-300 pl-8 relative">
+                                <span class="absolute left-4 top-4 font-serif italic opacity-30 text-2xl">"</span>
+                                <p id="apa-output" class="leading-relaxed"></p>
+                                <button onclick="copyToClipboard('apa-output', this)" class="absolute top-2 right-2 p-1.5 text-slate-400 hover:text-white bg-slate-800 rounded opacity-0 group-hover:opacity-100 transition-opacity" title="Copy to clipboard">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- MLA Citation -->
+                        <div class="group relative">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">MLA Format (9th Edition)</h3>
+                            <div class="bg-slate-900/60 border border-slate-700/50 p-4 rounded-lg text-slate-300 pl-8 relative">
+                                <span class="absolute left-4 top-4 font-serif italic opacity-30 text-2xl">"</span>
+                                <p id="mla-output" class="leading-relaxed"></p>
+                                <button onclick="copyToClipboard('mla-output', this)" class="absolute top-2 right-2 p-1.5 text-slate-400 hover:text-white bg-slate-800 rounded opacity-0 group-hover:opacity-100 transition-opacity" title="Copy to clipboard">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="mt-8 pt-6 border-t border-slate-700/50 hidden" id="summary-container">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Your Research Notes</h3>
+                            <div class="bg-slate-800/30 rounded-lg p-4 text-slate-300 prose prose-invert prose-sm max-w-none">
+                                <p id="summary-output" class="whitespace-pre-wrap"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-emerald-500/90 text-white px-4 py-3 rounded-lg shadow-lg shadow-emerald-500/20 backdrop-blur-sm transform transition-all duration-300 translate-y-20 opacity-0 flex items-center gap-2 z-50">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span>Copied to clipboard!</span>
+    </div>
+
+    <script>
+        document.getElementById('citation-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get values
+            const aFirst = document.getElementById('authorFirst').value.trim();
+            const aLast = document.getElementById('authorLast').value.trim();
+            const title = document.getElementById('title').value.trim();
+            const year = document.getElementById('publishDate').value.trim();
+            const publisher = document.getElementById('publisher').value.trim();
+            const url = document.getElementById('url').value.trim();
+            const summary = document.getElementById('summary').value.trim();
+
+            // Generate APA: Last, F. M. (Year). Title. Publisher. URL
+            const aFirstInitial = aFirst.charAt(0).toUpperCase() + '.';
+            const apaTitle = `<em>${title}</em>`;
+            let apaCitation = `${aLast}, ${aFirstInitial} (${year}). ${apaTitle}. ${publisher}.`;
+            if (url) apaCitation += ` ${url}`;
+            
+            // Generate MLA: Last, First. "Title." Publisher, Year. URL.
+            const mlaTitle = `"${title}."`;
+            const mlaPublisher = `<em>${publisher}</em>`;
+            let mlaCitation = `${aLast}, ${aFirst}. ${mlaTitle} ${mlaPublisher}, ${year}.`;
+            if (url) mlaCitation += ` ${url}`;
+
+            // Update UI
+            document.getElementById('apa-output').innerHTML = apaCitation;
+            document.getElementById('mla-output').innerHTML = mlaCitation;
+            
+            const summaryOutput = document.getElementById('summary-output');
+            const summaryContainer = document.getElementById('summary-container');
+            
+            if (summary) {
+                summaryOutput.textContent = summary;
+                summaryContainer.classList.remove('hidden');
+            } else {
+                summaryContainer.classList.add('hidden');
+            }
+
+            // Switch views
+            document.getElementById('empty-state').classList.add('hidden');
+            
+            const resultsArea = document.getElementById('results-area');
+            resultsArea.classList.remove('hidden');
+            
+            // Re-trigger animation
+            resultsArea.classList.remove('animate-fade-in');
+            void resultsArea.offsetWidth; // Trigger reflow
+            resultsArea.classList.add('animate-fade-in');
+        });
+
+        function copyToClipboard(elementId, btn) {
+            const el = document.getElementById(elementId);
+            const temp = document.createElement('textarea');
+            temp.value = el.innerText;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+
+            // Show toast
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            // Visual feedback on button
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                btn.innerHTML = originalHTML;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
