@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { KanbanBoard } from '@/components/KanbanBoard';
 import { NewTaskModal } from '@/components/NewTaskModal';
 import { Task } from '@/types';
-import { LogOut, Plus } from 'lucide-react';
+import { LogOut, Plus, User, Calendar, BookOpen, CheckCircle2, RefreshCw } from 'lucide-react';
 
 export default function BoardPage() {
   const router = useRouter();
@@ -13,6 +13,7 @@ export default function BoardPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<string>('');
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -20,20 +21,25 @@ export default function BoardPage() {
       router.push('/');
       return;
     }
-    const parsed = JSON.parse(storedUser);
-    setUser(parsed);
+    try {
+      const parsed = JSON.parse(storedUser);
+      setUser(parsed);
 
-    // Fetch tasks
-    fetch(`/api/tasks?email=${parsed.email}`)
-      .then(res => res.json())
-      .then(data => {
-        setTasks(data.tasks || []);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error fetching tasks:', err);
-        setLoading(false);
-      });
+      // Fetch user tasks
+      fetch(`/api/tasks?email=${encodeURIComponent(parsed.email)}`)
+        .then(res => res.json())
+        .then(data => {
+          setTasks(data.tasks || []);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error('Error fetching tasks:', err);
+          setLoading(false);
+        });
+    } catch {
+      localStorage.removeItem('user');
+      router.push('/');
+    }
   }, [router]);
 
   const handleLogout = () => {
@@ -42,19 +48,27 @@ export default function BoardPage() {
   };
 
   const handleTasksChange = async (newTasks: Task[]) => {
-    // Optimistic UI update
+    // Instant UI update
     setTasks(newTasks);
+    setSaveStatus('Saving...');
     
-    // Persist
-    if (user) {
+    // Persist to server
+    if (user?.email) {
       try {
-        await fetch('/api/tasks', {
+        const res = await fetch('/api/tasks', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: user.email, tasks: newTasks }),
         });
+        if (res.ok) {
+          setSaveStatus('Saved');
+          setTimeout(() => setSaveStatus(''), 2000);
+        } else {
+          setSaveStatus('Error saving');
+        }
       } catch (err) {
         console.error('Failed to persist tasks', err);
+        setSaveStatus('Error saving');
       }
     }
   };
@@ -68,56 +82,99 @@ export default function BoardPage() {
     await handleTasksChange(newTasks);
   };
 
+  const handleDeleteTask = async (taskId: string) => {
+    const newTasks = tasks.filter(t => t.id !== taskId);
+    await handleTasksChange(newTasks);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0b132b] flex items-center justify-center text-white">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+      <div className="min-h-screen bg-[#0b132b] flex flex-col items-center justify-center text-white">
+        <div className="w-10 h-10 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mb-4" />
+        <p className="text-slate-400 text-sm font-medium animate-pulse">Loading workspace...</p>
       </div>
     );
   }
 
+  const name = user?.profileInfo?.name || user?.name || user?.email || 'Researcher';
+  const dob = user?.profileInfo?.dateOfBirth || user?.dateOfBirth;
+
   return (
-    <main className="min-h-screen bg-[#0b132b] text-slate-200">
-      <header className="bg-[#141b33]/50 border-b border-white/5 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">
-              Kanban Hub
-            </h1>
-            <div className="hidden md:flex items-center gap-3 text-sm text-slate-400 border-l border-white/10 pl-4">
-              <span className="font-medium text-slate-300">{user?.profileInfo?.name || user?.email}</span>
-              {user?.profileInfo?.dateOfBirth && (
-                <>
-                  <span className="w-1 h-1 rounded-full bg-slate-600" />
-                  <span>DOB: {user.profileInfo.dateOfBirth}</span>
-                </>
+    <main className="min-h-screen bg-[#0b132b] text-slate-100 flex flex-col font-sans">
+      {/* Top Header Bar */}
+      <header className="bg-[#141b33]/80 border-b border-slate-800 backdrop-blur-xl sticky top-0 z-40 shadow-lg">
+        <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-5">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 border border-blue-400/30 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <div>
+                <h1 className="text-lg font-extrabold bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-400 bg-clip-text text-transparent leading-tight">
+                  Academic Citation Hub
+                </h1>
+                <p className="text-[10px] text-slate-400 font-medium tracking-wide">Kanban Workspace</p>
+              </div>
+            </div>
+
+            {/* Logged in User info header section */}
+            <div className="hidden md:flex items-center gap-3 text-xs text-slate-300 border-l border-slate-700/80 pl-5 py-1">
+              <div className="flex items-center gap-1.5 font-semibold text-slate-200">
+                <User className="w-3.5 h-3.5 text-blue-400" />
+                <span>{name}</span>
+              </div>
+              {dob && (
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <span>DOB: {dob}</span>
+                </div>
               )}
             </div>
           </div>
           
           <div className="flex items-center gap-4">
+            {saveStatus && (
+              <span className="text-xs text-slate-400 flex items-center gap-1.5 animate-fadeIn">
+                {saveStatus === 'Saving...' ? (
+                  <RefreshCw className="w-3.5 h-3.5 text-blue-400 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                )}
+                {saveStatus}
+              </span>
+            )}
+
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-all shadow-lg shadow-blue-500/20 transform hover:-translate-y-0.5"
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-all shadow-[0_0_20px_rgba(59,130,246,0.3)] transform hover:-translate-y-0.5 active:translate-y-0"
             >
               <Plus className="w-4 h-4" />
-              New Task
+              <span>New Task</span>
             </button>
+
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-rose-400 transition-all bg-slate-800/40 hover:bg-rose-500/10 px-3.5 py-2.5 rounded-xl border border-slate-700/50 hover:border-rose-500/30"
+              title="Logout"
             >
               <LogOut className="w-4 h-4" />
-              Logout
+              <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-[1400px] mx-auto px-6 py-8">
-        <KanbanBoard tasks={tasks} onTasksChange={handleTasksChange} />
+      {/* Main Board Content */}
+      <div className="flex-1 max-w-[1600px] w-full mx-auto px-6 py-8">
+        <KanbanBoard 
+          tasks={tasks} 
+          onTasksChange={handleTasksChange} 
+          onDeleteTask={handleDeleteTask}
+        />
       </div>
 
+      {/* Modal */}
       <NewTaskModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

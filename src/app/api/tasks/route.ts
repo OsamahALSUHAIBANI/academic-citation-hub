@@ -10,7 +10,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    const userData = await getUserData(email);
+    const cleanEmail = email.trim().toLowerCase();
+    const userData = await getUserData(cleanEmail);
+
     if (!userData) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -39,14 +41,16 @@ async function handleUpdateTasks(request: Request) {
       return NextResponse.json({ error: 'Email and tasks array are required' }, { status: 400 });
     }
 
-    const userData = await getUserData(email);
+    const cleanEmail = String(email).trim().toLowerCase();
+    const userData = await getUserData(cleanEmail);
+
     if (!userData) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    await updateUserData(email, { tasks });
+    await updateUserData(cleanEmail, { tasks });
 
-    return NextResponse.json({ message: 'Tasks updated successfully' }, { status: 200 });
+    return NextResponse.json({ message: 'Tasks updated successfully', tasks }, { status: 200 });
   } catch (error) {
     console.error('Update tasks error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

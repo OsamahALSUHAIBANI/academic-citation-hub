@@ -10,14 +10,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
     }
 
+    const cleanEmail = String(email).trim().toLowerCase();
+    const cleanPassword = String(password).trim();
+
     const profiles = await getProfiles();
-    const user = profiles.find(p => p.email === email && p.password === password);
+    const user = profiles.find(
+      p => p.email.toLowerCase() === cleanEmail && p.password === cleanPassword
+    );
 
     if (!user) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
-    const userData = await getUserData(email);
+    const userData = await getUserData(cleanEmail);
 
     return NextResponse.json({ message: 'Login successful', user: userData }, { status: 200 });
   } catch (error) {

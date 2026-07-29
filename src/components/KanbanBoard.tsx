@@ -21,11 +21,12 @@ import { TaskCard } from './TaskCard';
 interface KanbanBoardProps {
   tasks: Task[];
   onTasksChange: (tasks: Task[]) => void;
+  onDeleteTask?: (id: string) => void;
 }
 
 const COLUMNS: ColumnId[] = ['Backlog', 'To Do', 'In Progress', 'Done'];
 
-export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
+export function KanbanBoard({ tasks, onTasksChange, onDeleteTask }: KanbanBoardProps) {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   const sensors = useSensors(
@@ -93,13 +94,14 @@ export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-start">
         {COLUMNS.map(col => (
           <KanbanColumn
             key={col}
             id={col}
             title={col}
             tasks={tasks.filter(t => t.columnId === col)}
+            onDeleteTask={onDeleteTask}
           />
         ))}
       </div>

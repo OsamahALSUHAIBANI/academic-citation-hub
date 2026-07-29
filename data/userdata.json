@@ -1,0 +1,28 @@
+{
+  "user@example.com": {
+    "email": "user@example.com",
+    "profileInfo": {
+      "name": "Test User"
+    },
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Task 1"
+      }
+    ]
+  },
+  "apiuser@test.com": {
+    "email": "apiuser@test.com",
+    "profileInfo": {
+      "name": "API User",
+      "dateOfBirth": "1995-05-05"
+    },
+    "tasks": [
+      {
+        "id": "task-100",
+        "title": "Write documentation",
+        "status": "todo"
+      }
+    ]
+  }
+}

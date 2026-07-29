@@ -6,7 +6,7 @@ const PROFILES_FILE = path.join(DATA_DIR, 'profiles.csv');
 const USERDATA_FILE = path.join(DATA_DIR, 'userdata.json');
 
 // Ensure the data directory exists
-async function ensureDataDir() {
+export async function ensureDataDir(): Promise<void> {
   try {
     await fs.mkdir(DATA_DIR, { recursive: true });
   } catch (error) {
@@ -17,18 +17,29 @@ async function ensureDataDir() {
 // --------------------------------------------------------
 // profiles.csv operations
 // --------------------------------------------------------
-export async function appendProfile(email: string, password: string) {
+
+export interface Profile {
+  email: string;
+  password: string;
+}
+
+export async function appendProfile(email: string, password: string): Promise<void> {
   await ensureDataDir();
   
   try {
     let fileExists = true;
     try {
-      await fs.access(PROFILES_FILE);
+      const stats = await fs.stat(PROFILES_FILE);
+      if (stats.size === 0) {
+        fileExists = false;
+      }
     } catch {
       fileExists = false;
     }
 
-    const row = `${email},${password}\n`;
+    const cleanEmail = email.trim();
+    const cleanPassword = password.trim();
+    const row = `${cleanEmail},${cleanPassword}\n`;
     
     if (!fileExists) {
       await fs.writeFile(PROFILES_FILE, `email,password\n${row}`, 'utf8');
@@ -41,22 +52,22 @@ export async function appendProfile(email: string, password: string) {
   }
 }
 
-export async function getProfiles(): Promise<{ email: string; password: string }[]> {
+export async function getProfiles(): Promise<Profile[]> {
   try {
     const data = await fs.readFile(PROFILES_FILE, 'utf8');
     const lines = data.split('\n').filter(line => line.trim() !== '');
     
-    // Remove header
-    if (lines.length > 0 && lines[0].startsWith('email,password')) {
+    // Remove header if present
+    if (lines.length > 0 && lines[0].toLowerCase().startsWith('email,password')) {
       lines.shift();
     }
     
     return lines.map(line => {
       const [email, password] = line.split(',');
-      return { email, password };
+      return { email: email?.trim() || '', password: password?.trim() || '' };
     });
   } catch (error: any) {
-    // If file doesn't exist, return empty array
+    // If file doesn't exist or error reading, safely return empty array
     if (error.code === 'ENOENT') {
       return [];
     }
@@ -79,6 +90,9 @@ export interface UserData {
 export async function getAllUserData(): Promise<Record<string, UserData>> {
   try {
     const data = await fs.readFile(USERDATA_FILE, 'utf8');
+    if (!data.trim()) {
+      return {};
+    }
     return JSON.parse(data);
   } catch (error: any) {
     if (error.code === 'ENOENT') {
@@ -90,20 +104,53 @@ export async function getAllUserData(): Promise<Record<string, UserData>> {
 }
 
 export async function getUserData(email: string): Promise<UserData | null> {
+  try {
+    const allData = await getAllUserData();
+    return allData[email.trim()] || null;
+  } catch (error) {
+    console.error('Error getting user data for email:', email, error);
+    return null;
+  }
+}
+
+export async function createUserData(
+  email: string,
+  profileInfo?: Record<string, any>,
+  tasks?: any[]
+): Promise<UserData> {
+  await ensureDataDir();
+  const cleanEmail = email.trim();
   const allData = await getAllUserData();
-  return allData[email] || null;
+  
+  const newUserData: UserData = {
+    email: cleanEmail,
+    profileInfo: profileInfo || {},
+    tasks: tasks || [],
+  };
+
+  allData[cleanEmail] = newUserData;
+  
+  try {
+    await fs.writeFile(USERDATA_FILE, JSON.stringify(allData, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error creating user data:', error);
+    throw new Error('Failed to create user data');
+  }
+
+  return newUserData;
 }
 
 export async function updateUserData(email: string, data: Partial<UserData>): Promise<void> {
   await ensureDataDir();
   
   try {
+    const cleanEmail = email.trim();
     const allData = await getAllUserData();
     
-    if (!allData[email]) {
-      allData[email] = { email, ...data };
+    if (!allData[cleanEmail]) {
+      allData[cleanEmail] = { email: cleanEmail, ...data };
     } else {
-      allData[email] = { ...allData[email], ...data };
+      allData[cleanEmail] = { ...allData[cleanEmail], ...data };
     }
     
     await fs.writeFile(USERDATA_FILE, JSON.stringify(allData, null, 2), 'utf8');
