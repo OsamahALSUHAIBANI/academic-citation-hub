@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Legendary Dark Navy Kanban Board (Next.js)
 
-## Getting Started
+An interactive, local-first **Kanban Board** application designed for efficient task management. Features smooth drag-and-drop mechanics, local authentication, and file-based data storage. The entire application was constructed without writing manual code, utilizing **Prompt Engineering** techniques in alignment with course standards.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 📌 Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- 🎨 **Legendary Dark Navy Theme:** Modern visual styling built with Tailwind CSS, featuring glowing UI cards and color-coded priority badges (Low, Medium, High).
+- 📋 **Interactive Kanban Workflow:** Smooth drag-and-drop task movement across 4 core columns:
+  - `Backlog` (Ideas & deferred items)
+  - `To Do` (Pending tasks)
+  - `In Progress` (Active work)
+  - `Done` (Completed items)
+- 🔒 **100% Local File-Based Storage:**
+  - Credentials stored safely in a local CSV file (`data/profiles.csv`).
+  - User profiles and task entries managed in a JSON file (`data/userdata.json`) keyed by email.
+- ⚡ **Prompt-Driven Development:**
+  - Built sequentially using structured context (`CLAUDE.md`) and modular prompts (`prompts.md`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🏗️ Course Project Artifacts
 
-## Learn More
+This repository strictly adheres to the submission guidelines for prompt engineering coursework:
+1. **`CLAUDE.md`**: Context file containing specs, rules, data structure schemas, and project constraints.
+2. **`prompts.md`**: Guide containing the step-by-step execution prompts (Prompts 1 through 4) used to build the codebase.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Getting Started (Local Execution)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To run the project locally on your machine:
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Install Dependencies:**
+   ```bash
+   npm install
